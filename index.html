@@ -322,6 +322,22 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowRight") step(1);
 });
 
+/* swipe gestures on touch screens */
+let tsx=0, tsy=0, tst=0;
+box.addEventListener("touchstart",e=>{
+  const t=e.changedTouches[0]; tsx=t.clientX; tsy=t.clientY; tst=Date.now();
+},{passive:true});
+box.addEventListener("touchend",e=>{
+  const t=e.changedTouches[0];
+  const dx=t.clientX-tsx, dy=t.clientY-tsy, dt=Date.now()-tst;
+  if(dt>700) return;                                   // ignore slow drags
+  if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)){    // horizontal flick
+    step(dx<0 ? 1 : -1);                               // swipe left = next, right = previous
+  } else if(dy>90 && Math.abs(dy)>Math.abs(dx)){       // flick down
+    closeBox();                                        // swipe down to close
+  }
+},{passive:true});
+
 /* ---------- routing (browser back button returns to the album list) ---------- */
 function route(){
   const m = location.hash.match(/^#album\/(\d+)/);
