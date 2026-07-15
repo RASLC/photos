@@ -419,8 +419,15 @@ document.getElementById("footR").innerHTML = `<a class="iglink" href="${SITE.ins
 
 /* back-to-top button: shows after scrolling down a screenful+ */
 const toTop = document.getElementById("toTop");
-function onScroll(){ toTop.classList.toggle("show", window.scrollY > window.innerHeight*0.9); }
+const footerEl = document.querySelector("footer");
+function onScroll(){
+  toTop.classList.toggle("show", window.scrollY > window.innerHeight*0.9);
+  // when the footer scrolls into view, ride up and stop just above it
+  const gap = window.innerHeight - footerEl.getBoundingClientRect().top;
+  toTop.style.bottom = (gap > 4 ? gap + 12 : 16) + "px";
+}
 window.addEventListener("scroll", onScroll, {passive:true});
+window.addEventListener("resize", onScroll);
 toTop.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
 onScroll();
 
