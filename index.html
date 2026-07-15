@@ -40,8 +40,8 @@
   .hero-inner{position:relative;z-index:3;width:100%;padding-top:96px;padding-bottom:46px;}
   .hero-back{position:absolute;top:20px;left:0;z-index:4;margin-left:max(24px,calc((100% - 1200px)/2 + 24px));
     font-family:var(--mono);font-size:26px;line-height:1;color:#fff;text-decoration:none;
-    opacity:.85;text-shadow:0 1px 10px rgba(0,0,0,.55);transition:opacity .15s ease;display:none;}
-  .hero-back:hover,.hero-back:focus-visible{opacity:1;outline:none;}
+    opacity:.85;text-shadow:0 1px 10px rgba(0,0,0,.55);transition:opacity .15s ease,color .15s ease;display:none;}
+  .hero-back:hover,.hero-back:focus-visible{opacity:1;color:var(--blue);outline:none;}
   .hero.detail .hero-back{display:inline-block;}
 
   .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:11px;}
@@ -59,14 +59,18 @@
   .cover::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(10,11,14,.08) 0%,rgba(10,11,14,.12) 50%,rgba(10,11,14,.8) 100%);}
   .cover-cap{position:absolute;left:0;right:0;bottom:0;z-index:3;}
   .cover-cap .inner{max-width:1200px;margin:0 auto;padding:clamp(22px,4vw,48px) 24px;}
-  .cover-idx{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:rgba(255,255,255,.8);}
+  .cover-idx{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:rgba(255,255,255,.8);transition:color .2s ease;}
+  .cover:hover .cover-idx,.cover:focus-visible .cover-idx{color:var(--blue);}
   .cover-title{font-family:var(--display);font-weight:500;font-size:clamp(30px,6vw,62px);line-height:.98;letter-spacing:-.02em;color:#fff;margin-top:8px;}
   .cover-sub{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.72);margin-top:12px;}
 
   /* ---------------- ALBUM DETAIL: photo grid ---------------- */
-  .sheet{max-width:1200px;margin:0 auto;padding:30px 24px 90px;column-count:3;column-gap:3px;}
+  .sheet{max-width:1200px;margin:0 auto;padding:30px 24px 26px;column-count:3;column-gap:3px;}
   @media(max-width:760px){.sheet{column-count:2;}}
   @media(max-width:460px){.sheet{column-count:1;}}
+  .album-foot{max-width:1200px;margin:0 auto;padding:6px 24px 88px;}
+  .album-foot a{display:inline-block;font-family:var(--mono);font-size:26px;line-height:1;color:var(--muted);text-decoration:none;opacity:.9;transition:color .15s ease,opacity .15s ease;}
+  .album-foot a:hover,.album-foot a:focus-visible{color:var(--blue);opacity:1;outline:none;}
   .frame{break-inside:avoid;margin:0 0 3px;padding:0;border:1px solid var(--line);background:var(--panel);cursor:pointer;overflow:hidden;display:block;width:100%;line-height:0;
     opacity:0;transform:translateY(20px);
     transition:opacity .7s ease,transform .8s cubic-bezier(.2,.6,.2,1),box-shadow .25s ease,border-color .25s ease;}
@@ -86,9 +90,7 @@
   .box.open{display:flex;}
   .box figure{margin:0;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:flex-end;}
   .box img{max-width:92vw;max-height:80vh;object-fit:contain;box-shadow:0 30px 90px -30px #000;will-change:transform,opacity;}
-  .box figcaption{margin-top:14px;color:#adaeb4;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-align:right;line-height:1.7;
-    opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease;}
-  .box figcaption.show{opacity:1;transform:none;}
+  .box figcaption{margin-top:14px;color:#adaeb4;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-align:right;line-height:1.7;opacity:0;will-change:transform,opacity;}
   .box figcaption .fno{color:var(--blue);} .box figcaption .fname{color:#dcdce0;}
   .box button{position:absolute;background:transparent;border:1px solid rgba(255,255,255,.28);color:#fff;font-family:var(--mono);font-size:13px;width:46px;height:46px;border-radius:50%;cursor:pointer;transition:background .15s ease,border-color .15s ease;z-index:2;}
   .box button:hover,.box button:focus-visible{background:rgba(255,255,255,.12);border-color:#fff;outline:none;}
@@ -101,14 +103,13 @@
     right:max(20px,calc((100% - 1200px)/2 + 24px));
     border-bottom:1px solid rgba(255,255,255,.5);}
 
-  /* back-to-top button */
-  #toTop{position:fixed;right:18px;bottom:18px;z-index:40;width:34px;height:34px;border-radius:50%;
-    border:1px solid rgba(255,255,255,.14);background:rgba(20,21,26,.45);color:var(--ink);
-    font-family:var(--mono);font-size:13px;line-height:1;cursor:pointer;
-    opacity:0;transform:translateY(8px);pointer-events:none;backdrop-filter:blur(5px);
-    transition:opacity .3s ease,transform .3s ease,border-color .15s ease,background .15s ease;}
+  /* back-to-top arrow */
+  #toTop{position:fixed;right:20px;bottom:16px;z-index:40;border:0;background:transparent;color:var(--ink);
+    font-family:var(--mono);font-size:22px;line-height:1;cursor:pointer;padding:6px;
+    opacity:0;transform:translateY(8px);pointer-events:none;
+    transition:opacity .3s ease,transform .3s ease,color .15s ease;}
   #toTop.show{opacity:.4;transform:none;pointer-events:auto;}
-  #toTop.show:hover,#toTop.show:focus-visible{opacity:1;border-color:var(--blue);background:rgba(20,21,26,.85);outline:none;}
+  #toTop.show:hover,#toTop.show:focus-visible{opacity:1;color:var(--blue);outline:none;}
 
   @media(prefers-reduced-motion:reduce){
     *{transition:none!important;}
@@ -339,6 +340,10 @@ function openAlbum(ai){
     io.observe(b);
   });
   view.appendChild(sheet);
+  const foot = el("div","album-foot");
+  const bb = el("a"); bb.href = "#albums"; bb.textContent = "←"; bb.setAttribute("aria-label","Back to albums");
+  foot.appendChild(bb);
+  view.appendChild(foot);
   window.scrollTo({top:0});
 }
 
@@ -370,12 +375,17 @@ function renderBox(dir){
   // caption crossfade: fade out, swap while invisible, fade back in
   const line2 = [p.place, fmtDate(p.date)].filter(Boolean).join(" · ");
   const html = `<span class="fno">${pad(cur)}</span>&nbsp;&nbsp;<span class="fname">${p.name||""}</span>` + (line2?`<br>${line2}`:"");
-  boxCap.classList.remove("show");
+  const cdx = dir ? dir*56 : 0;
+  boxCap.style.transition = "none";
+  boxCap.style.opacity = "0";
+  boxCap.style.transform = "translateX(" + cdx + "px)";
+  boxCap.innerHTML = html;                 // swapped while invisible → no flicker
   clearTimeout(renderBox._t);
   renderBox._t = setTimeout(()=>{
-    boxCap.innerHTML = html;
-    requestAnimationFrame(()=>boxCap.classList.add("show"));
-  }, 380);
+    boxCap.style.transition = "transform .55s cubic-bezier(.33,.02,.15,1), opacity .5s ease";
+    boxCap.style.opacity = "1";
+    boxCap.style.transform = "translateX(0)";
+  }, dir ? 130 : 60);                       // trails the photo by a beat
 }
 document.getElementById("close").addEventListener("click",closeBox);
 document.getElementById("prev").addEventListener("click",()=>step(-1));
