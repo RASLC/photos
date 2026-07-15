@@ -1,116 +1,114 @@
-# Frame — your photo album site
+# Archive — your photo album site
 
-Everything lives in one file: **`index.html`**. To change anything, open that
-file in any text editor (Notepad, TextEdit, or edit it right on GitHub with the
-pencil ✏️ icon), make your change, and save. Nothing needs to be built.
+Everything lives in **`index.html`**, plus an **`images/`** folder for the photos
+in any albums you add. Edit `index.html` in any text editor (or on GitHub with the
+pencil icon) and save. Nothing needs to be built.
 
-> **Before you edit:** keep a copy of `index.html` somewhere safe. If a change
-> ever breaks the page, you can just put the old copy back.
+**What's included:** four built-in albums so you can see it working — *Wildlife*,
+*Big Cats*, *Birds & Reptiles*, and *Cold Climates*. Their photos are stored inside
+`index.html`, so they work the moment the site is live. Rename or delete any of them
+once you've had a look.
+
+> Before you edit: keep a spare copy of `index.html`. If an edit ever breaks the
+> page, put the copy back.
 
 ---
 
 ## 1. Put it online (GitHub Pages)
 
-1. On GitHub, click **New** to create a repository. Name it something like
-   `photos`, set it to **Public**, and click **Create repository**.
-2. Click **Add file → Upload files**, drag in `index.html`, then **Commit changes**.
-   The file must be named exactly `index.html`.
-3. Go to the repo's **Settings → Pages**. Under *Build and deployment*, set
-   **Source = Deploy from a branch**, branch **main**, folder **/ (root)**, and **Save**.
-4. Wait a minute, refresh, and your live link appears:
-   `https://YOUR-USERNAME.github.io/photos/`
+1. On GitHub, click New to create a repository. Name it e.g. `photos`, set it
+   Public, and Create repository.
+2. Click Add file -> Upload files, drag in `index.html` AND the whole `images`
+   folder, then Commit changes. `index.html` must keep that exact name.
+3. Repo Settings -> Pages -> Source "Deploy from a branch" -> branch main,
+   folder / (root) -> Save.
+4. Wait a minute, refresh, and your link appears: https://YOUR-USERNAME.github.io/photos/
 
-To update the site later, repeat step 2 (upload the new `index.html`; it will
-offer to replace the old one).
+Update later by uploading the changed files again (it offers to replace them).
 
 ---
 
-## 2. Change the main titles and text
+## 2. Change the front-page wording
 
-Open `index.html` and look near the top of the page section (around line 109):
+Open `index.html` and find the block that starts with FRONT-PAGE WORDING. It's one
+tidy list -- just edit the text inside the quotes:
 
-| What you see on the page        | Find this line              | Change the text between the tags |
-|---------------------------------|-----------------------------|----------------------------------|
-| The big title **Frame**         | `<h1>Frame</h1>`            | `<h1>My Photos</h1>`             |
-| The intro sentence under it     | `<p class="lede">A collection of photo albums…</p>` | Write your own sentence |
-| The year in **Updated 2026**    | `<span>Updated <b>2026</b></span>` | Change `2026` |
-| The footer (bottom of page)     | `<span>Frame — built with GitHub Pages</span>` and the line under it | Write your own |
+    const SITE = {
+      eyebrow: "Photographs · 2025-2026",   // small line above the big title
+      title:   "Archive",                    // the big title
+      intro:   "Animals, mostly ...",        // the sentence under it
+      footerLeft:  "Archive",                // bottom-left of the page
+      footerRight: "Toronto · 2025-2026"     // bottom-right of the page
+    };
 
-The small label above the title (**Photo Albums** / **Album**) is set in the
-script lower down. To change it, find these two lines and edit the words in quotes:
-
-```js
-document.getElementById("eyebrow").textContent = "Photo Albums";   // shown on the album list
-document.getElementById("eyebrow").textContent = "Album";          // shown inside an album
-```
+That's the only place you need to touch for the main text.
 
 ---
 
-## 3. Change a photo's name, location, or date
+## 3. How the images folder is organized
 
-Scroll to the section marked **`YOUR ALBUMS GO HERE`**. Each photo is one entry
-that looks like this:
+Keep ONE FOLDER PER ALBUM inside `images/`:
 
-```js
-{ name:"White tiger", place:"Toronto Zoo, ON", date:"2025-08-12",
-  src:"data:image/jpeg;base64,......" },
-```
+    images/
+      summer-2026-example/     <- a ready-made example (delete it whenever)
+        dock.jpg
+        canoe.jpg
+        trail.jpg
+      iceland-trip/            <- your own album
+        glacier.jpg
+        waterfall.jpg
 
-Edit the text inside the quotes for `name`, `place`, and `date`. Leave `src`
-alone — that is the photo itself. Dates are written `YYYY-MM-DD` (e.g.
-`2026-07-01`) and get formatted automatically (like *Jul 01, 2026*).
-
----
-
-## 4. Add more photos to an album
-
-1. Make a folder called **`images`** in the repo, next to `index.html`
-   (Add file → Upload files lets you drag a whole folder in).
-2. Put your photo files in it, e.g. `images/beach.jpg`.
-3. In the album's `photos:[ ... ]` list, add a line for each new photo:
-
-```js
-{ name:"Beach at sunset", place:"Tofino, BC", date:"2026-08-01", src:"images/beach.jpg" },
-```
-
-Keep the comma at the end of each line. The photos show in the order you list them.
-
-> The existing **Wildlife** photos are stored inside `index.html` itself, so they
-> already work. New photos you add use the `images/` folder instead — that is the
-> normal, simpler way. Both work side by side.
+File names can't contain spaces -- use dashes (north-shore.jpg). Any of .jpg /
+.jpeg / .png work. Resizing photos so the long side is ~1600px keeps the site fast.
 
 ---
 
-## 5. Add a whole new album
+## 4. Add a new album
 
-In the same `YOUR ALBUMS GO HERE` section, add a new block **after** the Wildlife
-one (there is already a commented-out example in the file you can copy):
+There's a ready example folder, `images/summer-2026-example/`, with three placeholder
+photos, and a matching commented-out album in `index.html`. To turn it on: find the
+"ADD YOUR OWN ALBUM" section and delete the // in front of each line of the example
+block. Save -- a new album appears at the bottom of the list.
 
-```js
-{
-  title:"Summer 2026",
-  place:"Muskoka, ON",
-  photos:[
-    { name:"Dock at dawn", place:"Muskoka, ON", date:"2026-07-01", src:"images/summer/dock.jpg" },
-    { name:"Canoe",        place:"Muskoka, ON", date:"2026-07-02", src:"images/summer/canoe.jpg" },
-  ]
-},
-```
+To make your own from scratch:
 
-- `title` and `place` show on the album's cover card.
-- The **first photo** in the list becomes the album's cover automatically.
-  (To pick a different cover, add `cover:"images/summer/dock.jpg"` under `place`.)
-- Put that album's photos in their own folder, e.g. `images/summer/`.
+1. Create a folder, e.g. `images/iceland-trip/`, and put the photos in.
+2. In the "YOUR ALBUMS GO HERE" list, add a block like this:
+
+    {
+      title:"Iceland 2026",
+      place:"Reykjavik",
+      photos:[
+        { name:"Glacier",   place:"Vatnajokull", date:"2026-02-10", src:"images/iceland-trip/glacier.jpg" },
+        { name:"Waterfall", place:"Skogafoss",   date:"2026-02-11", src:"images/iceland-trip/waterfall.jpg" },
+      ]
+    },
+
+- title and place show on the album's full-width cover.
+- The FIRST photo becomes the cover automatically (or add
+  cover:"images/iceland-trip/glacier.jpg" under place to choose one).
+- The big photo at the top of the front page uses the FOURTH photo of the first
+  album; change which album is listed first to change that hero image.
 
 ---
 
-## Three small things that prevent 99% of mistakes
+## 5. Add more photos to an album
 
-1. **Keep the commas.** Every photo line and every album block ends with a comma.
-2. **Use straight quotes** `"like this"`, not curly quotes `“like this”`. Some
-   word processors auto-change them — a plain text editor won't.
-3. **Don't touch the `src:"data:image..."` values** on the Wildlife photos; they
-   are the images themselves and are meant to be long.
+Drop the file into that album's folder, then add one line to its photos:[ ... ] list:
 
-If the page ever looks blank after an edit, undo your last change (or restore your
-backup copy) — it's almost always a missing comma or a curly quote.
+    { name:"Black sand beach", place:"Vik", date:"2026-02-12", src:"images/iceland-trip/beach.jpg" },
+
+Photos appear in the order they're listed, and fade in as you scroll. Keep the comma
+at the end of the line.
+
+---
+
+## Three things that prevent almost every mistake
+
+1. Keep the commas -- every photo line and every album block ends with one.
+2. Use straight quotes "like this", never curly quotes.
+3. Don't edit the src:"data:image..." values on the built-in albums -- those long
+   strings ARE the photos.
+
+If the page goes blank after an edit, undo it (or restore your backup) -- it's almost
+always a missing comma or a curly quote.
