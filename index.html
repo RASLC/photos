@@ -88,22 +88,24 @@
   /* ---------------- LIGHTBOX ---------------- */
   .box{position:fixed;inset:0;z-index:50;background:rgba(6,6,8,.97);display:none;align-items:center;justify-content:center;padding:32px;overflow:hidden;}
   .box.open{display:flex;}
-  .box figure{position:relative;margin:0;max-width:94vw;max-height:92vh;display:flex;align-items:center;justify-content:center;}
-  .box img{max-width:94vw;max-height:92vh;object-fit:contain;box-shadow:0 30px 90px -30px #000;will-change:transform,opacity;}
-  /* caption + map: one compact overlay pinned to the image's bottom-left (never clips) */
-  .capwrap{position:absolute;left:12px;bottom:12px;z-index:4;display:flex;flex-direction:column;align-items:stretch;gap:8px;
-    padding:9px 11px;border-radius:8px;background:rgba(8,9,12,.30);opacity:0;will-change:transform,opacity;
-    backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);width:min(52vw,196px);}
-  .box figcaption{margin:0;color:#adaeb4;font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-align:left;line-height:1.55;}
+  .box figure{position:relative;margin:0;max-width:92vw;max-height:88vh;display:flex;align-items:center;justify-content:center;}
+  .box img{max-width:92vw;max-height:88vh;object-fit:contain;box-shadow:0 30px 90px -30px #000;will-change:transform,opacity;}
+  /* caption + map: compact card in the viewport's bottom-left, off the photo */
+  .capwrap{position:absolute;left:20px;bottom:20px;z-index:3;display:flex;flex-direction:column;align-items:stretch;gap:8px;
+    padding:9px 11px;border-radius:8px;background:rgba(8,9,12,.34);opacity:0;will-change:transform,opacity;
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);width:auto;max-width:min(64vw,232px);}
+  .box figcaption{margin:0;color:#adaeb4;font-family:var(--mono);font-size:9.5px;letter-spacing:.04em;text-align:left;line-height:1.6;}
   .box figcaption .fno{color:var(--blue);} .box figcaption .fname{color:#e4e4e7;}
   .box figcaption .fmeta{color:#8a8b91;}
-  .box figcaption .fmeta2{color:#6b6c72;font-size:9px;letter-spacing:.03em;}
+  .box figcaption .fmeta2{color:#6b6c72;font-size:8.5px;letter-spacing:.02em;}
   .geolink{display:block;line-height:0;opacity:.95;transition:opacity .2s;
     border-top:1px solid rgba(255,255,255,.09);padding-top:8px;}
   .geolink:hover{opacity:1;} .geolink[hidden]{display:none;}
-  .geomap{width:100%;}
+  .geomap{position:relative;width:100%;}
   .geomap svg{display:block;width:100%;height:auto;overflow:hidden;border-radius:4px;}
-  .geoland{fill:rgba(255,255,255,.36);}            /* land visible, seas fully transparent */
+  .geolabel{position:absolute;left:6px;bottom:5px;font-family:var(--mono);font-size:8.5px;letter-spacing:.03em;
+    color:#f0f0f2;text-shadow:0 1px 4px rgba(0,0,0,.95),0 0 2px rgba(0,0,0,.9);pointer-events:none;}
+  .geoland{fill:rgba(255,255,255,.34);}            /* land visible, seas fully transparent */
   .geohalo{fill:var(--blue);opacity:.3;}
   .geodot{fill:var(--blue);stroke:rgba(0,0,0,.55);stroke-width:.9;}
 
@@ -112,7 +114,7 @@
     .box{padding:0;}
     .box figure{max-width:100vw;max-height:100dvh;width:100vw;height:100dvh;}
     .box img{max-width:100vw;max-height:100dvh;}
-    .capwrap{left:10px;bottom:10px;width:min(60vw,190px);}
+    .capwrap{left:12px;bottom:12px;max-width:min(64vw,190px);}
     .box .close{top:12px;right:12px;} .box .prev{left:8px;} .box .next{right:8px;}
   }
   .box button{position:absolute;background:transparent;border:1px solid rgba(255,255,255,.28);color:#fff;font-family:var(--mono);font-size:13px;width:46px;height:46px;border-radius:50%;cursor:pointer;transition:background .15s ease,border-color .15s ease;z-index:2;}
@@ -165,7 +167,8 @@
   <button class="next" id="next" aria-label="Next photo">→</button>
   <figure>
     <img id="boxImg" alt="">
-    <div class="capwrap">
+  </figure>
+      <div class="capwrap">
       <figcaption id="boxCap"></figcaption>
       <a class="geolink" id="geoLink" target="_blank" rel="noopener" hidden aria-label="Open location in Google Maps">
         <div id="geoMap" class="geomap">
@@ -174,10 +177,11 @@
         <circle id="geoHalo" class="geohalo" r="7"/>
         <circle id="geoDot" class="geodot" r="3.5"/>
           </svg>
+          <span class="geolabel" id="geoLabel"></span>
         </div>
       </a>
     </div>
-  </figure>
+
 </div>
 
 <script>
@@ -228,7 +232,7 @@ const albums = [
       { name:"Peak in the clouds", place:"Dolomites", date:"2025-10-30", dims:"8000 × 5333 · 43 MP", src:"images/italy-2025/05.webp" },
       { name:"Autumn valley", place:"Val di Funes", date:"2025-10-30", gear:"Sony α7R IV · Tamron 50-400mm", shot:"400mm · f/22 · 1/50s · ISO 1250", extra:"-1.7 EV · Multi · WB auto · No flash", dims:"9504 × 6336 · 60 MP", src:"images/italy-2025/06.webp" },
       { name:"Alpenglow at dusk", place:"Dolomites", date:"2025-10-30", dims:"5333 × 8000 · 43 MP", src:"images/italy-2025/07.webp" },
-      { name:"Portofino from the ferry", place:"Portofino", date:"2025-10-22", gear:"Google Pixel 8", shot:"f/1.7 · 1/873s · ISO 22", extra:"0 EV · Center-weighted · WB auto · No flash", dims:"3072 × 4080 · 13 MP", geo:"44.3, 9.2", src:"images/italy-2025/09.webp" },
+      { name:"Portofino from the ferry", place:"Portofino", date:"2025-10-22", gear:"Google Pixel 8", shot:"f/1.7 · 1/873s · ISO 22", extra:"0 EV · Center-weighted · WB auto · No flash", dims:"3072 × 4080 · 13 MP", geo:"44.3041, 9.2076", loc:"Portofino, Italy", src:"images/italy-2025/09.webp" },
       { name:"Seaside balconies", place:"Liguria", date:"2025-10-19", gear:"Sony α7R IV · Tamron 50-400mm", shot:"93mm · f/6.3 · 1/13s · ISO 100", src:"images/italy-2025/08.webp" },
     ]
   },
@@ -238,9 +242,9 @@ const albums = [
     place:"Osaka & Hakone",
     cover:"images/japan-2024/01.avif",
     photos:[
-      { name:"Rainbow chevrons", place:"Hakone Open-Air Museum", date:"2024-12-27", gear:"Sony α7R IV · Tamron 50-400mm", shot:"209mm · f/20 · 1/80s · ISO 1250", extra:"0 EV · Average · WB auto · No flash", dims:"1616 × 1080 · 2 MP", geo:"35.2, 139.1", src:"images/japan-2024/01.avif" },
-      { name:"Nakanoshima, Osaka", place:"Nakanoshima, Osaka", date:"2024-12-25", gear:"Google Pixel 8", shot:"f/1.7 · 1/358s · ISO 19", extra:"0 EV · Center-weighted · WB auto · No flash", dims:"4080 × 3072 · 13 MP", geo:"34.7, 135.5", src:"images/japan-2024/02.avif" },
-      { name:"Flight, at dusk", place:"Hakone Open-Air Museum", date:"2024-12-27", gear:"Google Pixel 8", shot:"f/1.7 · 1/160s · ISO 30", extra:"0 EV · Center-weighted · WB auto · No flash", dims:"3072 × 4080 · 13 MP", geo:"35.2, 139.1", src:"images/japan-2024/03.avif" },
+      { name:"Rainbow chevrons", place:"Hakone Open-Air Museum", date:"2024-12-27", gear:"Sony α7R IV · Tamron 50-400mm", shot:"209mm · f/20 · 1/80s · ISO 1250", extra:"0 EV · Average · WB auto · No flash", dims:"1616 × 1080 · 2 MP", geo:"35.2448, 139.0526", loc:"Hakone, Japan", src:"images/japan-2024/01.avif" },
+      { name:"Nakanoshima, Osaka", place:"Nakanoshima, Osaka", date:"2024-12-25", gear:"Google Pixel 8", shot:"f/1.7 · 1/358s · ISO 19", extra:"0 EV · Center-weighted · WB auto · No flash", dims:"4080 × 3072 · 13 MP", geo:"34.6922, 135.4955", loc:"Osaka, Japan", src:"images/japan-2024/02.avif" },
+      { name:"Flight, at dusk", place:"Hakone Open-Air Museum", date:"2024-12-27", gear:"Google Pixel 8", shot:"f/1.7 · 1/160s · ISO 30", extra:"0 EV · Center-weighted · WB auto · No flash", dims:"3072 × 4080 · 13 MP", geo:"35.2448, 139.0526", loc:"Hakone, Japan", src:"images/japan-2024/03.avif" },
     ]
   },
 
@@ -377,23 +381,25 @@ function renderBox(dir){
   if(p.shot) html += `<br><span class="fmeta">${p.shot}</span>`;
   if(p.extra) html += `<br><span class="fmeta2">${p.extra}</span>`;
   if(p.dims)  html += `<br><span class="fmeta2">${p.dims}</span>`;
-  // location: a coarse dot on a regional map window, linking to Google Maps
+  // location: a coarse dot on a regional map window, with place label + Google Maps link
   const geoLink=document.getElementById("geoLink"), geoSvg=document.getElementById("geoSvg"),
+        geoLabel=document.getElementById("geoLabel"),
         dot=document.getElementById("geoDot"), halo=document.getElementById("geoHalo");
   if(p.geo){
     const parts=p.geo.split(",").map(s=>parseFloat(s));
     const cx=(parts[1]+180), cy=(90-parts[0]);
     dot.setAttribute("cx",cx); dot.setAttribute("cy",cy);
     halo.setAttribute("cx",cx); halo.setAttribute("cy",cy);
-    // window centred on the dot: mostly land, little blank ocean, clamped to the map
     const W=132, H=66;
     let x0=Math.max(0,Math.min(360-W, cx-W/2)), y0=Math.max(0,Math.min(180-H, cy-H/2));
     geoSvg.setAttribute("viewBox", x0+" "+y0+" "+W+" "+H);
+    geoLabel.textContent = p.loc || "";
     geoLink.href="https://www.google.com/maps?q="+parts[0]+","+parts[1];
     geoLink.hidden=false;
   } else { geoLink.hidden=true; }
   const cdx = dir ? dir*56 : 0;
   boxCap.innerHTML = html;                 // text swapped while overlay is invisible
+  capwrap.style.pointerEvents = "";
   capwrap.style.transition = "none";
   capwrap.style.opacity = "0";
   capwrap.style.transform = "translateX(" + cdx + "px)";
@@ -418,10 +424,16 @@ document.addEventListener("keydown",e=>{
 const ZOOM=2.6;
 let zs=1, ztx=0, zty=0;
 function resetZoom(){ zs=1; ztx=0; zty=0; }
+function setCapVisible(v){
+  if(!capwrap) return;
+  capwrap.style.opacity = v ? "1" : "0";
+  capwrap.style.pointerEvents = v ? "" : "none";
+}
 function applyZoom(anim){
   boxImg.style.transition = anim ? "transform .3s ease" : "none";
   boxImg.style.transform = `translate(${ztx}px,${zty}px) scale(${zs})`;
   boxImg.style.cursor = zs>1 ? "grab" : "";
+  setCapVisible(zs===1);                 // metadata hides when zoomed, returns at 1x
 }
 function clampPan(){
   const mx=(zs-1)*boxImg.offsetWidth/2, my=(zs-1)*boxImg.offsetHeight/2;
@@ -439,6 +451,19 @@ function toggleZoom(cx,cy){
   applyZoom(true);
 }
 boxImg.addEventListener("dblclick", e=>toggleZoom(e.clientX,e.clientY));
+
+/* desktop: click-drag to pan while zoomed in */
+let mdown=false, mpx=0, mpy=0;
+boxImg.addEventListener("mousedown", e=>{
+  if(zs<=1) return;
+  mdown=true; mpx=e.clientX; mpy=e.clientY; boxImg.style.cursor="grabbing"; e.preventDefault();
+});
+window.addEventListener("mousemove", e=>{
+  if(!mdown) return;
+  ztx += e.clientX-mpx; zty += e.clientY-mpy; mpx=e.clientX; mpy=e.clientY;
+  clampPan(); applyZoom(false);
+});
+window.addEventListener("mouseup", ()=>{ if(mdown){ mdown=false; if(zs>1) boxImg.style.cursor="grab"; } });
 
 let sx=0, sy=0, st=0, px=0, py=0, lastTap=0, ltx=0, lty=0;
 box.addEventListener("touchstart", e=>{
