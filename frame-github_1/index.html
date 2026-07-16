@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archive</title>
+
+<!-- =================================================================== -->
+<!--  HOW TO ADD A NEW ALBUM                                              -->
+<!--  Scroll to the list marked "YOUR ALBUMS GO HERE".                    -->
+<!--  Put a new album's photos in  images/your-album-name/  and add a     -->
+<!--  block pointing each photo's src at "images/your-album-name/pic.jpg" -->
+<!--  A ready example folder + commented album are included below.        -->
+<!-- =================================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#101114; --panel:#191a1f; --ink:#ededeb; --muted:#8a8b91;
+    --line:#2a2b32; --blue:#a9c194;
+    --display:"Fraunces", Georgia, serif;
+    --body:"IBM Plex Sans", system-ui, sans-serif;
+    --mono:"IBM Plex Mono", ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 24px;}
+  img{display:block;}
+
+  /* ---------------- HERO (full-bleed photo + overlaid text) ---------------- */
+  .hero{position:relative;min-height:62vh;display:flex;align-items:flex-end;overflow:hidden;background:#0d0e11;}
+  .hero-media{position:absolute;inset:0;}
+  .hero-media img{width:100%;height:100%;object-fit:cover;filter:brightness(.82) saturate(.95);transform:scale(1.02);}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg,rgba(12,13,17,.28) 0%,rgba(12,13,17,.05) 38%,rgba(16,17,20,.92) 100%);}
+  .hero-inner{position:relative;z-index:3;width:100%;padding-top:96px;padding-bottom:46px;}
+  .hero-back{position:absolute;top:20px;left:0;z-index:4;margin-left:max(24px,calc((100% - 1200px)/2 + 24px));
+    font-family:var(--mono);font-size:26px;line-height:1;color:#fff;text-decoration:none;
+    opacity:.85;text-shadow:0 1px 10px rgba(0,0,0,.55);transition:opacity .15s ease,color .15s ease;display:none;}
+  .hero-back:hover,.hero-back:focus-visible{opacity:1;color:var(--blue);outline:none;}
+  .hero.detail .hero-back{display:inline-block;}
+
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);display:flex;align-items:center;gap:11px;}
+  .eyebrow::before{content:"";width:28px;height:1px;background:var(--blue);}
+  h1.title{font-family:var(--display);font-weight:500;font-size:clamp(46px,10vw,104px);line-height:.94;letter-spacing:-.02em;margin:16px 0 0;color:#fff;}
+  .lede{max-width:34ch;margin:18px 0 0;color:rgba(255,255,255,.82);font-size:clamp(15px,2vw,18px);line-height:1.45;}
+  .herometa{margin-top:22px;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:rgba(255,255,255,.66);}
+
+  /* ---------------- ALBUM INDEX: stacked full-width covers ---------------- */
+  #view{display:block;}
+  .cover{position:relative;display:block;width:100%;height:clamp(320px,56vh,600px);overflow:hidden;cursor:pointer;border:0;padding:0;margin:0;text-align:left;background:#0d0e11;font:inherit;color:inherit;}
+  .cover > img{width:100%;height:100%;object-fit:cover;filter:brightness(.74) saturate(.95);transition:transform 1.1s cubic-bezier(.2,.6,.2,1),filter .6s ease;}
+  .cover:hover > img,.cover:focus-visible > img{transform:scale(1.045);filter:brightness(.82) saturate(1);}
+  .cover:focus-visible{outline:2px solid var(--blue);outline-offset:-2px;}
+  .cover::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(10,11,14,.08) 0%,rgba(10,11,14,.12) 50%,rgba(10,11,14,.8) 100%);}
+  .cover-cap{position:absolute;left:0;right:0;bottom:0;z-index:3;}
+  .cover-cap .inner{max-width:1200px;margin:0 auto;padding:clamp(22px,4vw,48px) 24px;}
+  .cover-idx{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:rgba(255,255,255,.8);transition:color .2s ease;}
+  .cover:hover .cover-idx,.cover:focus-visible .cover-idx{color:var(--blue);}
+  .cover-title{font-family:var(--display);font-weight:500;font-size:clamp(30px,6vw,62px);line-height:.98;letter-spacing:-.02em;color:#fff;margin-top:8px;}
+  .cover-sub{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:rgba(255,255,255,.72);margin-top:12px;}
+
+  /* ---------------- ALBUM DETAIL: photo grid ---------------- */
+  .sheet{max-width:1200px;margin:0 auto;padding:30px 24px 26px;column-count:3;column-gap:3px;}
+  @media(max-width:760px){.sheet{column-count:2;}}
+  @media(max-width:460px){.sheet{column-count:1;}}
+  .album-foot{max-width:1200px;margin:0 auto;padding:6px 24px 88px;}
+  .album-foot a{display:inline-block;font-family:var(--mono);font-size:26px;line-height:1;color:var(--muted);text-decoration:none;opacity:.9;transition:color .15s ease,opacity .15s ease;}
+  .album-foot a:hover,.album-foot a:focus-visible{color:var(--blue);opacity:1;outline:none;}
+  .frame{break-inside:avoid;margin:0 0 3px;padding:0;border:1px solid var(--line);background:var(--panel);cursor:pointer;overflow:hidden;display:block;width:100%;line-height:0;
+    opacity:0;transform:translateY(20px);
+    transition:opacity .7s ease,transform .8s cubic-bezier(.2,.6,.2,1),box-shadow .25s ease,border-color .25s ease;}
+  .frame.in{opacity:1;transform:none;}
+  .frame:hover,.frame:focus-visible{box-shadow:0 14px 34px -18px rgba(0,0,0,.8);border-color:#45464f;outline:none;z-index:2;}
+  .frame:focus-visible{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue);}
+  .frame img{width:100%;height:auto;background:#0d0e11;transition:transform .7s cubic-bezier(.2,.6,.2,1),filter .4s ease;}
+  .frame:hover img,.frame:focus-visible img{transform:scale(1.06);filter:brightness(1.07);}
+
+  footer{border-top:1px solid var(--line);}
+  footer .wrap{padding:26px 24px 54px;font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+  .iglink{color:#5c5d63;text-decoration:none;font-size:11px;letter-spacing:.08em;transition:color .15s ease;}
+  .iglink:hover,.iglink:focus-visible{color:var(--blue);outline:none;}
+
+  /* ---------------- LIGHTBOX ---------------- */
+  .box{position:fixed;inset:0;z-index:50;background:rgba(6,6,8,.97);display:none;align-items:center;justify-content:center;padding:32px;overflow:hidden;}
+  .box.open{display:flex;}
+  .box figure{margin:0;max-width:92vw;max-height:92vh;display:flex;flex-direction:column;align-items:flex-end;}
+  .box img{max-width:92vw;max-height:80vh;object-fit:contain;box-shadow:0 30px 90px -30px #000;will-change:transform,opacity;}
+  .box figcaption{margin-top:14px;color:#adaeb4;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-align:right;line-height:1.7;opacity:0;will-change:transform,opacity;}
+  .box figcaption .fno{color:var(--blue);} .box figcaption .fname{color:#dcdce0;}
+  .box figcaption .fmeta{color:#7c7d83;}
+  .box button{position:absolute;background:transparent;border:1px solid rgba(255,255,255,.28);color:#fff;font-family:var(--mono);font-size:13px;width:46px;height:46px;border-radius:50%;cursor:pointer;transition:background .15s ease,border-color .15s ease;z-index:2;}
+  .box button:hover,.box button:focus-visible{background:rgba(255,255,255,.12);border-color:#fff;outline:none;}
+  .box .close{top:24px;right:24px;} .box .prev{left:24px;top:50%;transform:translateY(-50%);} .box .next{right:24px;top:50%;transform:translateY(-50%);}
+  @media(max-width:520px){.box .prev{left:14px;} .box .next{right:14px;} .box .close{top:16px;right:16px;}}
+
+  /* thin inset white rule near the bottom of hero + covers */
+  .frameline{position:absolute;top:20px;bottom:20px;z-index:2;pointer-events:none;
+    left:max(20px,calc((100% - 1200px)/2 + 24px));
+    right:max(20px,calc((100% - 1200px)/2 + 24px));
+    border-bottom:1px solid rgba(255,255,255,.5);}
+
+  /* back-to-top arrow */
+  #toTop{position:fixed;right:20px;bottom:16px;z-index:40;border:0;background:transparent;color:var(--ink);
+    font-family:var(--mono);font-size:22px;line-height:1;cursor:pointer;padding:6px;
+    opacity:0;transform:translateY(8px);pointer-events:none;
+    transition:opacity .3s ease,transform .3s ease,color .15s ease;}
+  #toTop.show{opacity:.4;transform:none;pointer-events:auto;}
+  #toTop.show:hover,#toTop.show:focus-visible{opacity:1;color:var(--blue);outline:none;}
+
+  @media(prefers-reduced-motion:reduce){
+    *{transition:none!important;}
+    .frame,.cover{opacity:1!important;transform:none!important;}
+    .hero-media img{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero" id="hero">
+  <div class="hero-media"><img id="heroImg" alt=""></div>
+  <div class="frameline"></div>
+  <a class="hero-back" id="heroBack" href="#albums" aria-label="Back to albums">←</a>
+  <div class="hero-inner wrap" id="heroInner"></div>
+</header>
+
+<main id="view"></main>
+
+<footer><div class="wrap">
+  <span id="footL">Archive</span>
+  <span id="footR">Toronto · 2025–2026</span>
+</div></footer>
+
+<button id="toTop" aria-label="Back to top" title="Back to top">↑</button>
+
+<div class="box" id="box" role="dialog" aria-modal="true" aria-label="Photo viewer">
+  <button class="close" id="close" aria-label="Close">✕</button>
+  <button class="prev" id="prev" aria-label="Previous photo">←</button>
+  <button class="next" id="next" aria-label="Next photo">→</button>
+  <figure><img id="boxImg" alt=""><figcaption id="boxCap"></figcaption></figure>
+</div>
+
+<script>
+/* ===================================================================
+   YOUR ALBUMS GO HERE
+   Each album has a title, a place, and a list of photos.
+   The first photo becomes the album cover (or add cover:"...").
+   =================================================================== */
+const albums = [
+  {
+    title:"Animals",
+    place:"Toronto Zoo, ON",
+    photos:[
+      { name:"Tiger", place:"Toronto Zoo, ON", date:"2025-08-12", src:"images/wildlife/01.webp" },
+      { name:"White lioness", place:"Toronto Zoo, ON", date:"2025-08-12", src:"images/wildlife/02.webp" },
+      { name:"Capybara", place:"Toronto Zoo, ON", date:"2025-08-12", src:"images/wildlife/03.webp" },
+      { name:"Tiger, resting", place:"Toronto Zoo, ON", date:"2025-08-12", src:"images/wildlife/04.webp" },
+      { name:"Gorilla", place:"Toronto Zoo, ON", date:"2025-07-30", src:"images/wildlife/05.webp" },
+      { name:"Goat in a tyre", place:"Toronto Zoo, ON", date:"2025-07-30", src:"images/wildlife/06.webp" },
+      { name:"Zebra", place:"Toronto Zoo, ON", date:"2025-07-30", src:"images/wildlife/07.webp" },
+      { name:"Cheetah", place:"Toronto Zoo, ON", date:"2025-07-30", src:"images/wildlife/08.webp" },
+      { name:"Hippopotamus", place:"Toronto Zoo, ON", date:"2025-07-18", src:"images/wildlife/09.webp" },
+      { name:"Sunflowers", place:"Toronto Zoo, ON", date:"2025-07-18", src:"images/wildlife/10.webp" },
+      { name:"Arctic fox, curled", place:"Toronto Zoo, ON", date:"2025-06-25", src:"images/wildlife/11.webp" },
+      { name:"Green tree python", place:"Toronto Zoo, ON", date:"2025-06-25", src:"images/wildlife/12.webp" },
+      { name:"Snail on the rail", place:"Toronto Zoo, ON", date:"2025-06-25", src:"images/wildlife/13.webp" },
+      { name:"Polar bear, sleeping", place:"Toronto Zoo, ON", date:"2025-06-25", src:"images/wildlife/14.webp" },
+      { name:"Sparrow on a branch", place:"Toronto Zoo, ON", date:"2025-06-11", src:"images/wildlife/15.webp" },
+      { name:"Grasshoppers", place:"Toronto Zoo, ON", date:"2025-06-11", src:"images/wildlife/16.webp" },
+      { name:"Scarlet ibis", place:"Toronto Zoo, ON", date:"2025-05-29", src:"images/wildlife/17.webp" },
+      { name:"Indian rhinoceros", place:"Toronto Zoo, ON", date:"2025-05-29", src:"images/wildlife/18.webp" },
+      { name:"Giraffe", place:"Toronto Zoo, ON", date:"2025-05-29", src:"images/wildlife/19.webp" },
+      { name:"Baboon", place:"Toronto Zoo, ON", date:"2025-05-29", src:"images/wildlife/20.webp" },
+      { name:"Fox in the grass", place:"Toronto Zoo, ON", date:"2025-05-14", src:"images/wildlife/21.webp" },
+      { name:"Ring-tailed lemur", place:"Toronto Zoo, ON", date:"2025-05-14", src:"images/wildlife/22.webp" },
+    ]
+  },
+
+  {
+    title:"Italy 2025",
+    place:"Dolomites & Liguria",
+    cover:"images/italy-2025/05.webp",
+    photos:[
+      { name:"Paraglider over the pass", place:"Dolomites", date:"2025-10-29", gear:"Sony α7R IV · Tamron 50-400mm", shot:"164mm · f/25 · 1/100s · ISO 320", src:"images/italy-2025/01.webp" },
+      { name:"Red wing above the clouds", place:"Dolomites", date:"2025-10-29", src:"images/italy-2025/02.webp" },
+      { name:"Lone figure on the ridge", place:"Dolomites", date:"2025-10-29", gear:"Sony α7R IV · Tamron 50-400mm", shot:"95mm · f/6.3 · 1/400s · ISO 125", src:"images/italy-2025/03.webp" },
+      { name:"Autumn larches in the mist", place:"Dolomites", date:"2025-10-30", gear:"Sony α7R IV · Tamron 50-400mm", shot:"50mm · f/22 · 1/80s · ISO 400", src:"images/italy-2025/04.webp" },
+      { name:"Peak in the clouds", place:"Dolomites", date:"2025-10-30", src:"images/italy-2025/05.webp" },
+      { name:"Autumn valley", place:"Val di Funes", date:"2025-10-30", gear:"Sony α7R IV · Tamron 50-400mm", shot:"400mm · f/22 · 1/50s · ISO 1250", src:"images/italy-2025/06.webp" },
+      { name:"Alpenglow at dusk", place:"Dolomites", date:"2025-10-30", src:"images/italy-2025/07.webp" },
+      { name:"Portofino from the ferry", place:"Portofino", date:"2025-10-22", gear:"Google Pixel 8", shot:"f/1.7 · 1/873s · ISO 22", src:"images/italy-2025/09.webp" },
+      { name:"Seaside balconies", place:"Liguria", date:"2025-10-19", gear:"Sony α7R IV · Tamron 50-400mm", shot:"93mm · f/6.3 · 1/13s · ISO 100", src:"images/italy-2025/08.webp" },
+    ]
+  },
+
+  {
+    title:"Japan 2024",
+    place:"Osaka",
+    cover:"images/japan-2024/01.avif",
+    photos:[
+      { name:"Rainbow chevrons", place:"Osaka", date:"2024-12-27", gear:"Sony α7R IV · Tamron 50-400mm", shot:"209mm · f/20 · 1/80s · ISO 1250", src:"images/japan-2024/01.avif" },
+      { name:"Nakanoshima, Osaka", place:"Nakanoshima, Osaka", date:"2024-12-25", gear:"Google Pixel 8", shot:"f/1.7 · 1/358s · ISO 19", src:"images/japan-2024/02.avif" },
+      { name:"Flight, at dusk", place:"Japan", date:"2024-12-27", gear:"Google Pixel 8", shot:"f/1.7 · 1/160s · ISO 30", src:"images/japan-2024/03.avif" },
+    ]
+  },
+
+  // ---- ADD YOUR OWN ALBUM --------------------------------------------
+  // Put photos in images/your-album-name/ and copy a block below.
+  // { title:"Trip", place:"Somewhere", photos:[
+  //   { name:"Photo", place:"Somewhere", date:"2026-01-01", src:"images/trip/01.jpg" },
+  // ] },
+  // --------------------------------------------------------------------
+];
+/* =========================  end of albums  ========================= */
+
+/* ===================================================================
+   FRONT-PAGE WORDING — edit the text inside the quotes below.
+   =================================================================== */
+const SITE = {
+  eyebrow: "Photographs · 2025–2026",
+  title:   "Archive",
+  intro:   "A place to keep the photos worth coming back to — people, places, animals, experiences, macros, cars, and whatever else is worth a second look.",
+  instagram: "https://www.instagram.com/raslc/",
+  handle:    "@raslc"
+};
+
+/* ---------- helpers ---------- */
+const pad = n => String(n+1).padStart(3,"0");
+const fmtDate = s => { if(!s) return ""; const d=new Date(s+"T00:00"); return isNaN(d)?s:d.toLocaleDateString("en-CA",{year:"numeric",month:"short",day:"2-digit"}); };
+const yearsOf = a => { const ys=[...new Set(a.photos.map(p=>(p.date||"").slice(0,4)).filter(Boolean))].sort(); return ys.length?(ys[0]===ys[ys.length-1]?ys[0]:ys[0]+"–"+ys[ys.length-1]):""; };
+const coverOf = a => a.cover || (a.photos[0] && a.photos[0].src) || "";
+const el = (t,c)=>{const e=document.createElement(t); if(c) e.className=c; return e;};
+const totalPhotos = albums.reduce((n,a)=>n+a.photos.length,0);
+const siteHero = (albums[0] && albums[0].photos[3] && albums[0].photos[3].src) || coverOf(albums[0]||{photos:[]});
+
+const view = document.getElementById("view");
+const hero = document.getElementById("hero");
+const heroImg = document.getElementById("heroImg");
+const heroInner = document.getElementById("heroInner");
+
+/* ---------- reveal on scroll ---------- */
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+},{rootMargin:"0px 0px -6% 0px", threshold:0.04});
+
+/* ---------- ALBUM INDEX ---------- */
+function showAlbums(){
+  closeBox();
+  hero.classList.remove("detail");
+  heroImg.src = siteHero;
+  heroInner.innerHTML =
+    `<div class="eyebrow">${SITE.eyebrow}</div>
+     <h1 class="title">${SITE.title}</h1>
+     <p class="lede">${SITE.intro}</p>
+     <div class="herometa">${albums.length} albums · ${totalPhotos} photos</div>`;
+  view.innerHTML = "";
+  albums.forEach((a,ai)=>{
+    const c = el("button","cover");
+    c.setAttribute("aria-label", a.title+" — open album");
+    c.innerHTML =
+      `<img src="${coverOf(a)}" alt="${a.title.replace(/"/g,'&quot;')} cover" loading="lazy">
+       <div class="frameline"></div>
+       <div class="cover-cap"><div class="inner">
+         <div class="cover-idx">${pad(ai)}</div>
+         <div class="cover-title">${a.title}</div>
+         <div class="cover-sub">${[a.photos.length+" photos", a.place, yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}</div>
+       </div></div>`;
+    c.addEventListener("click",()=>{ location.hash = "#album/"+ai; });
+    view.appendChild(c);
+    io.observe(c);
+  });
+  window.scrollTo({top:0});
+}
+
+/* ---------- ALBUM DETAIL ---------- */
+let active = [];
+function openAlbum(ai){
+  const a = albums[ai];
+  if(!a){ location.hash=""; return; }
+  closeBox();
+  active = a.photos;
+  hero.classList.add("detail");
+  heroImg.src = coverOf(a);
+  heroInner.innerHTML =
+    `<div class="eyebrow">${a.place||"Album"}</div>
+     <h1 class="title">${a.title}</h1>
+     <div class="herometa">${[a.photos.length+" photos", yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}</div>`;
+  view.innerHTML = "";
+  const sheet = el("div","sheet");
+  a.photos.forEach((p,i)=>{
+    const b = el("button","frame");
+    b.setAttribute("aria-label",(p.name||"Photo")+" — open full size");
+    b.innerHTML = `<img src="${p.src}" alt="${(p.name||"Photograph").replace(/"/g,'&quot;')}" loading="lazy">`;
+    b.addEventListener("click",()=>openBox(i));
+    sheet.appendChild(b);
+    io.observe(b);
+  });
+  view.appendChild(sheet);
+  const foot = el("div","album-foot");
+  const bb = el("a"); bb.href = "#albums"; bb.textContent = "←"; bb.setAttribute("aria-label","Back to albums");
+  foot.appendChild(bb);
+  view.appendChild(foot);
+  window.scrollTo({top:0});
+}
+
+/* ---------- LIGHTBOX ---------- */
+const box = document.getElementById("box");
+const boxImg = document.getElementById("boxImg");
+const boxCap = document.getElementById("boxCap");
+let cur = 0;
+function openBox(i){ cur=i; renderBox(0); box.classList.add("open"); document.body.style.overflow="hidden"; document.getElementById("close").focus(); }
+function closeBox(){ box.classList.remove("open"); document.body.style.overflow=""; }
+function step(d){ cur=(cur+d+active.length)%active.length; renderBox(d); }
+function renderBox(dir){
+  const p = active[cur]; if(!p) return;
+  boxImg.src = p.src; boxImg.alt = p.name || "Photograph";
+  if(dir){
+    boxImg.style.transition = "none";
+    boxImg.style.transform = "translateX(" + (dir*72) + "px)";
+    boxImg.style.opacity = "0";
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      boxImg.style.transition = "transform .62s cubic-bezier(.33,.02,.15,1), opacity .6s ease";
+      boxImg.style.transform = "translateX(0)";
+      boxImg.style.opacity = "1";
+    }));
+  } else {
+    boxImg.style.transition = "opacity .45s ease";
+    boxImg.style.transform = "translateX(0)";
+    boxImg.style.opacity = "1";
+  }
+  // caption crossfade: fade out, swap while invisible, fade back in
+  const line2 = [p.place, fmtDate(p.date)].filter(Boolean).join(" · ");
+  let html = `<span class="fno">${pad(cur)}</span>&nbsp;&nbsp;<span class="fname">${p.name||""}</span>`;
+  if(line2) html += `<br>${line2}`;
+  if(p.gear) html += `<br><span class="fmeta">${p.gear}</span>`;
+  if(p.shot) html += `<br><span class="fmeta">${p.shot}</span>`;
+  const cdx = dir ? dir*56 : 0;
+  boxCap.style.transition = "none";
+  boxCap.style.opacity = "0";
+  boxCap.style.transform = "translateX(" + cdx + "px)";
+  boxCap.innerHTML = html;                 // swapped while invisible → no flicker
+  clearTimeout(renderBox._t);
+  renderBox._t = setTimeout(()=>{
+    boxCap.style.transition = "transform .55s cubic-bezier(.33,.02,.15,1), opacity .5s ease";
+    boxCap.style.opacity = "1";
+    boxCap.style.transform = "translateX(0)";
+  }, dir ? 130 : 60);                       // trails the photo by a beat
+}
+document.getElementById("close").addEventListener("click",closeBox);
+document.getElementById("prev").addEventListener("click",()=>step(-1));
+document.getElementById("next").addEventListener("click",()=>step(1));
+box.addEventListener("click",e=>{ if(e.target===box) closeBox(); });
+document.addEventListener("keydown",e=>{
+  if(!box.classList.contains("open")) return;
+  if(e.key==="Escape") closeBox();
+  if(e.key==="ArrowLeft") step(-1);
+  if(e.key==="ArrowRight") step(1);
+});
+/* swipe gestures */
+let tsx=0,tsy=0,tst=0;
+box.addEventListener("touchstart",e=>{const t=e.changedTouches[0];tsx=t.clientX;tsy=t.clientY;tst=Date.now();},{passive:true});
+box.addEventListener("touchend",e=>{
+  const t=e.changedTouches[0]; const dx=t.clientX-tsx,dy=t.clientY-tsy,dt=Date.now()-tst;
+  if(dt>700) return;
+  if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)) step(dx<0?1:-1);
+  else if(dy>90 && Math.abs(dy)>Math.abs(dx)) closeBox();
+},{passive:true});
+
+/* ---------- routing ---------- */
+function route(){
+  const m = location.hash.match(/^#album\/(\d+)/);
+  if(m) openAlbum(parseInt(m[1],10)); else showAlbums();
+}
+window.addEventListener("hashchange",route);
+document.title = SITE.title;
+document.getElementById("footL").textContent = "";
+document.getElementById("footR").innerHTML = `<a class="iglink" href="${SITE.instagram}" target="_blank" rel="noopener">${SITE.handle}</a>`;
+
+/* back-to-top button: shows after scrolling down a screenful+ */
+const toTop = document.getElementById("toTop");
+const footerEl = document.querySelector("footer");
+function onScroll(){
+  toTop.classList.toggle("show", window.scrollY > window.innerHeight*0.9);
+  // when the footer scrolls into view, ride up and stop just above it
+  const gap = window.innerHeight - footerEl.getBoundingClientRect().top;
+  toTop.style.bottom = (gap > 4 ? gap + 12 : 16) + "px";
+}
+window.addEventListener("scroll", onScroll, {passive:true});
+window.addEventListener("resize", onScroll);
+toTop.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+onScroll();
+
+route();
+</script>
+</body>
+</html>
