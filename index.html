@@ -69,8 +69,41 @@
   @media(max-width:760px){.sheet{column-count:2;}}
   @media(max-width:460px){.sheet{column-count:1;}}
   .album-foot{max-width:1200px;margin:0 auto;padding:6px 24px 88px;}
+  .sortbar{max-width:1200px;margin:0 auto;padding:0 24px 14px;display:flex;align-items:center;gap:12px;justify-content:flex-end;}
+  .sortlbl{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  .sortopt{font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 1px;transition:color .14s ease;}
+  .sortopt:hover{color:var(--ink);}
+  .sortopt.sel{color:var(--blue);}
+  .fchip{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--blue);display:inline-flex;align-items:center;gap:6px;}
+  .fchipx{background:none;border:none;color:var(--blue);cursor:pointer;font-size:11px;padding:0 0 0 1px;opacity:.75;transition:opacity .12s ease;}
+  .fchipx:hover{opacity:1;}
   .album-foot a{display:inline-block;font-family:var(--mono);font-size:26px;line-height:1;color:var(--muted);text-decoration:none;opacity:.9;transition:color .15s ease,opacity .15s ease;}
   .album-foot a:hover,.album-foot a:focus-visible{color:var(--blue);opacity:1;outline:none;}
+  /* filter control (sits inline in the hero meta, same size) */
+  .filterbtn{font:inherit;color:var(--blue);background:none;border:none;padding:0 0 0 2px;margin:0;cursor:pointer;
+    letter-spacing:inherit;opacity:.9;transition:opacity .15s ease;}
+  .filterbtn:hover,.filterbtn:focus-visible{opacity:1;outline:none;text-decoration:underline;text-underline-offset:3px;}
+  .fpanel{position:fixed;z-index:60;width:min(90vw,320px);max-height:min(70vh,520px);overflow:auto;
+    background:rgba(20,21,26,.96);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+    border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 14px 12px;
+    box-shadow:0 24px 70px -20px #000;opacity:0;transform:translateY(-6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease;}
+  .fpanel.open{opacity:1;transform:translateY(0);pointer-events:auto;}
+  .fgroup{margin:0 0 12px;}
+  .fgroup h4{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 7px;font-weight:600;}
+  .fopts{display:flex;flex-wrap:wrap;gap:6px;}
+  .fopt{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink);
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:999px;
+    padding:5px 10px;cursor:pointer;transition:all .12s ease;}
+  .fopt .n{color:var(--muted);margin-left:5px;font-size:10px;}
+  .fopt:hover{border-color:rgba(169,193,148,.5);}
+  .fopt.sel{background:var(--blue);border-color:var(--blue);color:#12140f;}
+  .fopt.sel .n{color:#12140f;opacity:.7;}
+  .fbar{display:flex;gap:8px;justify-content:flex-end;align-items:center;border-top:1px solid rgba(255,255,255,.09);padding-top:11px;margin-top:2px;}
+  .fbar button{font-family:var(--mono);font-size:11px;letter-spacing:.04em;border-radius:8px;padding:7px 13px;cursor:pointer;border:1px solid transparent;transition:all .12s ease;}
+  .fclear{background:none;color:var(--muted);border-color:rgba(255,255,255,.12)!important;}
+  .fclear:hover{color:var(--ink);}
+  .fapply{background:var(--blue);color:#12140f;font-weight:600;}
+  .fapply:disabled{opacity:.4;cursor:default;}
   .frame{break-inside:avoid;margin:0 0 3px;padding:0;border:1px solid var(--line);background:var(--panel);cursor:pointer;overflow:hidden;display:block;width:100%;line-height:0;
     opacity:0;transform:translateY(20px);
     transition:opacity .7s ease,transform .8s cubic-bezier(.2,.6,.2,1),box-shadow .25s ease,border-color .25s ease;}
@@ -290,6 +323,7 @@ const albums = [
       { name:"Osaka, at night", place:"Nakanoshima, Osaka", date:"2024-12-25", gear:"Google Pixel 8", shot:"f/1.7 · 1/358s · ISO 19", extra:"0 EV", dims:"4080 × 3072 · 13 MP", geo:"34.6922, 135.4955", loc:"Osaka, Japan", src:"images/japan-2024/46.avif" },
       { name:"Hakone", place:"Hakone", date:"2024-12-27", gear:"Sony α7R IV · Tamron 50-400mm", shot:"209mm · f/20 · 1/80s · ISO 1250", extra:"0 EV", dims:"1616 × 1080 · 2 MP", geo:"35.2448, 139.0526", loc:"Hakone, Japan", src:"images/japan-2024/47.avif" },
       { name:"Hakone", place:"Hakone", date:"2024-12-27", gear:"Google Pixel 8", shot:"f/1.7 · 1/160s · ISO 30", extra:"0 EV", dims:"3072 × 4080 · 13 MP", geo:"35.2449, 139.0520", loc:"Hakone, Japan", src:"images/japan-2024/48.avif" },
+      { name:"Nara", place:"Nara", date:"2024-12-25", gear:"Sony α7R IV · Tamron 50-400mm", dims:"9568 × 6376 · 61 MP", src:"images/japan-2024/49.avif" },
     ]
   },
 
@@ -332,16 +366,135 @@ const io = new IntersectionObserver((entries)=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
 },{rootMargin:"0px 0px -6% 0px", threshold:0.04});
 
+/* ---------- FILTERS & METADATA ---------- */
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;");
+const locOf = p => p.place || p.loc || "";
+const shotTok = p => (p.shot||"").split("·").map(s=>s.trim());
+const focalMM   = p => { const t=shotTok(p).find(x=>/^\d+mm$/.test(x)); return t?parseInt(t):null; };
+const apVal     = p => { const t=shotTok(p).find(x=>/^f\//.test(x)); return t?parseFloat(t.slice(2)):null; };
+const isoVal    = p => { const t=shotTok(p).find(x=>/^ISO/i.test(x)); return t?parseInt(t.replace(/\D/g,"")):null; };
+const shutterS  = p => { const t=shotTok(p).find(x=>/s$/.test(x)&&!/mm$/.test(x)&&/\d/.test(x)); if(!t)return null;
+  const v=t.replace(/s$/,""); if(v.includes("/")){const[a,b]=v.split("/");return (+a)/(+b);} return parseFloat(v); };
+const dimsWH    = p => { const m=(p.dims||"").match(/(\d+)\s*×\s*(\d+)/); return m?[+m[1],+m[2]]:null; };
+const cameraOf  = p => p.gear ? p.gear.split("·")[0].trim() : "";
+const lensOf    = p => { const parts=(p.gear||"").split("·"); return parts.length>1?parts[1].trim():""; };
+const bandFocal = mm=> mm==null?"":(mm<=35?"Wide (≤35mm)":mm<=70?"Standard (36–70mm)":mm<=200?"Tele (71–200mm)":"Super-tele (>200mm)");
+const bandAp    = f => f==null?"":(f<=2.8?"f/1.4–2.8":f<=5.6?"f/3.2–5.6":f<=11?"f/6.3–11":"f/13+");
+const bandIso   = v => v==null?"":(v<=200?"ISO ≤200":v<=1600?"ISO 250–1600":v<=6400?"ISO 2000–6400":"ISO >6400");
+const bandShut  = s => s==null?"":(s>=1?"1s or slower":s>=1/30?"1/2–1/30s":s>=1/250?"1/40–1/250s":"Faster than 1/250s");
+const formatOf  = p => { const wh=dimsWH(p); if(!wh)return""; return Math.abs(wh[0]-wh[1])/Math.max(wh[0],wh[1])<0.02?"Square":(wh[0]>wh[1]?"Landscape":"Portrait"); };
+
+const FILTER_DEFS = [
+  {key:"year",     label:"Year",         get:p=>(p.date||"").slice(0,4)},
+  {key:"location", label:"Location",     get:locOf},
+  {key:"camera",   label:"Camera",       get:cameraOf},
+  {key:"lens",     label:"Lens",         get:lensOf},
+  {key:"focal",    label:"Focal length", get:p=>bandFocal(focalMM(p)), order:["Wide (≤35mm)","Standard (36–70mm)","Tele (71–200mm)","Super-tele (>200mm)"]},
+  {key:"aperture", label:"Aperture",     get:p=>bandAp(apVal(p)),      order:["f/1.4–2.8","f/3.2–5.6","f/6.3–11","f/13+"]},
+  {key:"iso",      label:"ISO",          get:p=>bandIso(isoVal(p)),    order:["ISO ≤200","ISO 250–1600","ISO 2000–6400","ISO >6400"]},
+  {key:"shutter",  label:"Shutter",      get:p=>bandShut(shutterS(p)), order:["1s or slower","1/2–1/30s","1/40–1/250s","Faster than 1/250s"]},
+  {key:"format",   label:"Format",       get:formatOf,                 order:["Landscape","Portrait","Square"]},
+];
+const DEF_BY_KEY = Object.fromEntries(FILTER_DEFS.map(d=>[d.key,d]));
+const allPhotos = () => albums.flatMap(a=>a.photos);
+
+function groupsFrom(photos){
+  return FILTER_DEFS.map(d=>{
+    const counts={};
+    photos.forEach(p=>{ const v=d.get(p); if(v) counts[v]=(counts[v]||0)+1; });
+    return {def:d, counts};
+  }).filter(g=>Object.keys(g.counts).length);
+}
+function matchIn(photos,key,value){ const d=DEF_BY_KEY[key]; return d?photos.filter(p=>d.get(p)===value):[]; }
+
+/* dropdown panel — reused by the archive and by each album */
+const fpanel = el("div","fpanel"); document.body.appendChild(fpanel);
+let fopen=false, fsel=null, fanchor=null, fapply=null;
+function orderedKeys(g){
+  const ks=Object.keys(g.counts);
+  return g.def.order ? ks.sort((a,b)=>g.def.order.indexOf(a)-g.def.order.indexOf(b))
+                     : ks.sort((a,b)=>g.counts[b]-g.counts[a] || String(a).localeCompare(String(b)));
+}
+function renderPanel(groups, current){
+  fsel = current || null;
+  const body = groups.map(g=>{
+    const opts = orderedKeys(g).map(k=>{
+      const sel = fsel && fsel.key===g.def.key && fsel.value===k;
+      return `<button class="fopt${sel?" sel":""}" data-key="${g.def.key}" data-value="${esc(k)}">${esc(k)}<span class="n">${g.counts[k]}</span></button>`;
+    }).join("");
+    return `<div class="fgroup"><h4>${esc(g.def.label)}</h4><div class="fopts">${opts}</div></div>`;
+  }).join("") || `<div class="fgroup"><h4>No filters available</h4></div>`;
+  fpanel.innerHTML = body + `<div class="fbar"><button class="fclear" id="fClear">Show all</button><button class="fapply" id="fApply"${fsel?"":" disabled"}>Show photos</button></div>`;
+  fpanel.querySelectorAll(".fopt").forEach(o=>o.addEventListener("click",()=>{
+    const was=o.classList.contains("sel");
+    fpanel.querySelectorAll(".fopt").forEach(x=>x.classList.remove("sel"));
+    if(was){ fsel=null; } else { o.classList.add("sel"); fsel={key:o.dataset.key,value:o.dataset.value}; }
+    fpanel.querySelector("#fApply").disabled=!fsel;
+  }));
+  fpanel.querySelector("#fApply").addEventListener("click",()=>{ if(!fsel)return; const s=fsel; closeFilterPanel(); fapply&&fapply(s); });
+  fpanel.querySelector("#fClear").addEventListener("click",()=>{ closeFilterPanel(); fapply&&fapply(null); });
+}
+function positionPanel(anchor){
+  const r=anchor.getBoundingClientRect(), w=Math.min(window.innerWidth*0.9,320);
+  fpanel.style.left = Math.max(10, Math.min(r.left, window.innerWidth-10-w)) + "px";
+  fpanel.style.top  = (r.bottom+8) + "px";           // sits under the trigger and tracks it on scroll
+}
+function openFilterPanel(anchor, photos, onApply, current){
+  fanchor=anchor; fapply=onApply;
+  renderPanel(groupsFrom(photos), current);
+  positionPanel(anchor); fpanel.classList.add("open"); fopen=true;
+}
+function closeFilterPanel(){ fpanel.classList.remove("open"); fopen=false; fanchor=null; }
+document.addEventListener("click",e=>{ if(fopen && !fpanel.contains(e.target) && !e.target.closest(".filterbtn")) closeFilterPanel(); });
+window.addEventListener("scroll",()=>{ if(fopen && fanchor) positionPanel(fanchor); }, {passive:true});
+window.addEventListener("resize",()=>{ if(fopen && fanchor) positionPanel(fanchor); });
+
+/* ---------- FILTERED VIEW (archive-wide, behaves like an album) ---------- */
+function openFilter(key,value){
+  const d=DEF_BY_KEY[key];
+  const matches = (d?matchIn(allPhotos(),key,value):[]).sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+  if(!matches.length){ location.hash="#albums"; return; }
+  closeBox(); closeFilterPanel();
+  active = matches;
+  hero.classList.add("detail");
+  heroImg.src = matches[0].src;
+  heroInner.innerHTML =
+    `<div class="eyebrow">Filtered · ${esc(d.label)}</div>
+     <h1 class="title">${esc(value)}</h1>
+     <div class="herometa">${matches.length} photo${matches.length!==1?"s":""} · from all albums</div>`;
+  view.innerHTML="";
+  const sheet=el("div","sheet");
+  matches.forEach((p,i)=>{
+    const b=el("button","frame");
+    b.setAttribute("aria-label",(p.name||"Photo")+" — open full size");
+    b.innerHTML=`<img src="${p.src}" alt="${esc(p.name||"Photograph")}" loading="lazy">`;
+    b.addEventListener("click",()=>openBox(i));
+    sheet.appendChild(b); io.observe(b);
+  });
+  view.appendChild(sheet);
+  const foot=el("div","album-foot");
+  const bb=el("a"); bb.href="#albums"; bb.textContent="←"; bb.setAttribute("aria-label","Back to albums");
+  foot.appendChild(bb); view.appendChild(foot);
+  window.scrollTo({top:0});
+}
+
 /* ---------- ALBUM INDEX ---------- */
 function showAlbums(){
-  closeBox();
+  closeBox(); closeFilterPanel();
   hero.classList.remove("detail");
   heroImg.src = siteHero;
   heroInner.innerHTML =
     `<div class="eyebrow">${SITE.eyebrow}</div>
      <h1 class="title">${SITE.title}</h1>
      <p class="lede">${SITE.intro}</p>
-     <div class="herometa">${albums.length} albums · ${totalPhotos} photos</div>`;
+     <div class="herometa">${albums.length} albums · ${totalPhotos} photos<button class="filterbtn" id="filterBtn"> · Filter ▾</button></div>`;
+  const fb=document.getElementById("filterBtn");
+  if(fb) fb.addEventListener("click",e=>{ e.stopPropagation();
+    if(fopen){ closeFilterPanel(); }
+    else openFilterPanel(fb, allPhotos(), sel=>{
+      location.hash = sel ? "#filter/"+encodeURIComponent(sel.key)+"/"+encodeURIComponent(sel.value) : "#albums";
+    });
+  });
   view.innerHTML = "";
   albums.forEach((a,ai)=>{
     const c = el("button","cover");
@@ -363,20 +516,52 @@ function showAlbums(){
 
 /* ---------- ALBUM DETAIL ---------- */
 let active = [];
-function openAlbum(ai){
-  const a = albums[ai];
-  if(!a){ location.hash=""; return; }
-  closeBox();
-  active = a.photos;
-  hero.classList.add("detail");
-  heroImg.src = coverOf(a);
-  heroInner.innerHTML =
-    `<div class="eyebrow">${a.place||"Album"}</div>
-     <h1 class="title">${a.title}</h1>
-     <div class="herometa">${[a.photos.length+" photos", yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}</div>`;
+let curAlbum = -1, sortMode = "index", sortDir = 1, albumFilter = null;
+
+function sortList(list){
+  const arr = list.map((p,i)=>({p,i}));
+  if(sortMode==="date")
+    arr.sort((x,y)=> sortDir*((x.p.date||"").localeCompare(y.p.date||"")) || (x.i-y.i));
+  else if(sortMode==="location")
+    arr.sort((x,y)=> sortDir*(locOf(x.p).localeCompare(locOf(y.p))) || (x.i-y.i));
+  else
+    arr.sort((x,y)=> sortDir*(x.i-y.i));
+  return arr.map(o=>o.p);
+}
+function setSort(mode){
+  if(sortMode===mode) sortDir*=-1;
+  else { sortMode=mode; sortDir = (mode==="date"? -1 : 1); }   // date defaults newest-first
+  renderAlbumBody(albums[curAlbum]);
+}
+function renderAlbumBody(a){
+  let list = a.photos.slice();
+  if(albumFilter){ const d=DEF_BY_KEY[albumFilter.key]; list = list.filter(p=>d.get(p)===albumFilter.value); }
+  active = sortList(list);
   view.innerHTML = "";
+
+  const hasDate = a.photos.some(p=>p.date);
+  const hasLoc  = a.photos.some(p=>locOf(p));
+  const bar = el("div","sortbar");
+  let html = "";
+  if(hasDate || hasLoc){
+    const arrow = sortDir<0 ? " ↓" : " ↑";
+    const opt = (mode,label)=>`<button class="sortopt${sortMode===mode?" sel":""}" data-mode="${mode}">${label}${sortMode===mode?arrow:""}</button>`;
+    html += `<span class="sortlbl">Sort</span>` + opt("index","Album")
+      + (hasDate?opt("date","Date"):"") + (hasLoc?opt("location","Location"):"");
+  }
+  if(albumFilter){
+    html += `<span class="fchip">${esc(DEF_BY_KEY[albumFilter.key].label)}: ${esc(albumFilter.value)} <button class="fchipx" id="albClear" aria-label="Clear filter">✕</button></span>`;
+  }
+  if(html){
+    bar.innerHTML = html;
+    bar.querySelectorAll(".sortopt").forEach(b=>b.addEventListener("click",()=>setSort(b.dataset.mode)));
+    const cx = bar.querySelector("#albClear");
+    if(cx) cx.addEventListener("click",()=>{ albumFilter=null; renderAlbumBody(a); });
+    view.appendChild(bar);
+  }
+
   const sheet = el("div","sheet");
-  a.photos.forEach((p,i)=>{
+  active.forEach((p,i)=>{
     const b = el("button","frame");
     b.setAttribute("aria-label",(p.name||"Photo")+" — open full size");
     b.innerHTML = `<img src="${p.src}" alt="${(p.name||"Photograph").replace(/"/g,'&quot;')}" loading="lazy">`;
@@ -385,10 +570,29 @@ function openAlbum(ai){
     io.observe(b);
   });
   view.appendChild(sheet);
+
   const foot = el("div","album-foot");
   const bb = el("a"); bb.href = "#albums"; bb.textContent = "←"; bb.setAttribute("aria-label","Back to albums");
   foot.appendChild(bb);
   view.appendChild(foot);
+}
+function openAlbum(ai){
+  const a = albums[ai];
+  if(!a){ location.hash=""; return; }
+  closeBox(); closeFilterPanel();
+  curAlbum = ai; sortMode = "index"; sortDir = 1; albumFilter = null;
+  hero.classList.add("detail");
+  heroImg.src = coverOf(a);
+  heroInner.innerHTML =
+    `<div class="eyebrow">${a.place||"Album"}</div>
+     <h1 class="title">${a.title}</h1>
+     <div class="herometa">${[a.photos.length+" photos", yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}<button class="filterbtn" id="albFilterBtn"> · Filter ▾</button></div>`;
+  const afb = document.getElementById("albFilterBtn");
+  if(afb) afb.addEventListener("click",e=>{ e.stopPropagation();
+    if(fopen){ closeFilterPanel(); }
+    else openFilterPanel(afb, a.photos, sel=>{ albumFilter = sel; renderAlbumBody(a); }, albumFilter);
+  });
+  renderAlbumBody(a);
   window.scrollTo({top:0});
 }
 
@@ -537,8 +741,11 @@ box.addEventListener("touchend", e=>{
 
 /* ---------- routing ---------- */
 function route(){
+  const mf = location.hash.match(/^#filter\/([^/]+)\/(.+)$/);
+  if(mf){ openFilter(decodeURIComponent(mf[1]), decodeURIComponent(mf[2])); return; }
   const m = location.hash.match(/^#album\/(\d+)/);
-  if(m) openAlbum(parseInt(m[1],10)); else showAlbums();
+  if(m){ openAlbum(parseInt(m[1],10)); return; }
+  showAlbums();
 }
 window.addEventListener("hashchange",route);
 document.title = SITE.title;
