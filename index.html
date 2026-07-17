@@ -486,7 +486,7 @@ function showAlbums(){
     `<div class="eyebrow">${SITE.eyebrow}</div>
      <h1 class="title">${SITE.title}</h1>
      <p class="lede">${SITE.intro}</p>
-     <div class="herometa">${albums.length} albums · ${totalPhotos} photos<button class="filterbtn" id="filterBtn"> · Filter ▾</button></div>`;
+     <div class="herometa">${albums.length} albums · ${totalPhotos} photos ·<button class="filterbtn" id="filterBtn">Filter ▾</button></div>';
   const fb=document.getElementById("filterBtn");
   if(fb) fb.addEventListener("click",e=>{ e.stopPropagation();
     if(fopen){ closeFilterPanel(); }
@@ -585,7 +585,7 @@ function openAlbum(ai){
   heroInner.innerHTML =
     `<div class="eyebrow">${a.place||"Album"}</div>
      <h1 class="title">${a.title}</h1>
-     <div class="herometa">${[a.photos.length+" photos", yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}<button class="filterbtn" id="albFilterBtn"> · Filter ▾</button></div>`;
+     <div class="herometa">${[a.photos.length+" photos", yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}<span class="separator">&nbsp;&nbsp;·&nbsp;&nbsp;</span><button class="filterbtn" id="albFilterBtn">Filter ▾</button></div>';
   const afb = document.getElementById("albFilterBtn");
   if(afb) afb.addEventListener("click",e=>{ e.stopPropagation();
     if(fopen){ closeFilterPanel(); }
