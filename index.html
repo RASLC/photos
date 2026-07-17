@@ -585,7 +585,7 @@ function openAlbum(ai){
   heroInner.innerHTML =
     `<div class="eyebrow">${a.place||"Album"}</div>
      <h1 class="title">${a.title}</h1>
-     <div class="herometa">${[a.photos.length+" photos · ", yearsOf(a)].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}<button class="filterbtn" id="albFilterBtn">Filter ▾</button></div>`;
+     <div class="herometa">${[a.photos.length+" photos", yearsOf(a) · ].filter(Boolean).join("&nbsp;&nbsp;·&nbsp;&nbsp;")}<button class="filterbtn" id="albFilterBtn">Filter ▾</button></div>`;
   const afb = document.getElementById("albFilterBtn");
   if(afb) afb.addEventListener("click",e=>{ e.stopPropagation();
     if(fopen){ closeFilterPanel(); }
